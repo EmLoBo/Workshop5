@@ -25,10 +25,17 @@ public class MockBookService implements BookService {
     }
 
     @Override
-    public void addBook(Book book) {
+    public Book addBook(Book book) {
 
-        book.setId(nextId++);
+        long lastId = 0;
+        for (Book b : getBooks()) {
+            if (lastId < b.getId()) {
+                lastId = b.getId();
+            }
+        }
+        book.setId(++lastId);
         list.add(book);
+        return book;
 
     }
 

@@ -25,11 +25,6 @@ public class Book {
         return id;
     }
 
-    public void setId(Long aLong) {
-
-        this.id = id;
-    }
-
     public String getIsbn() {
         return isbn;
     }
@@ -68,5 +63,8 @@ public class Book {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public void setId(long l) {
     }
 }

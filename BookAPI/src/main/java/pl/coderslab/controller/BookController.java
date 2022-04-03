@@ -9,8 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import pl.coderslab.model.JsonResponse;
 
 import java.util.List;
+
+
 
 @RestController
 @RequestMapping(value = "/books")
@@ -28,6 +31,10 @@ public class BookController {
 
     public Book book;
 
+    @RequestMapping("")
+    public List<Book> books() {
+        return bookService.getBooks();
+    }
 
     @RequestMapping("/helloBook")
     public Book helloBook() {
@@ -36,15 +43,35 @@ public class BookController {
     }
 
 
-    @RequestMapping(value = "/addBook", method = RequestMethod.POST, produces = "text/html; charset=utf-8")
-    @ResponseBody
-    public String addBook(@RequestParam Book book) {
-        bookService.addBook(book);
+  //  @RequestMapping(value = "/addBook", method = RequestMethod.POST, produces = "text/html; charset=utf-8")
+//    public String addBook(@RequestBody Book book) {
+//
+//        bookService.addBook(book);
+//
+//        return "book added";
+//    }
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public JsonResponse addBook(@RequestParam String isbn,
+                               @RequestParam String title,
+                               @RequestParam String author,
+                               @RequestParam String publisher,
+                               @RequestParam String type
 
-        return "redirect:list";
+                               ) {
+
+        long lastId = 0;
+        for (Book b : bookService.getBooks()) {
+            if (lastId < b.getId()) {
+                lastId = b.getId();
+            }
+        }
+        Book book = new Book(++lastId, isbn, title , author, publisher, type);
+        bookService.addBook(book);
+        return new JsonResponse("created new book", book);
     }
 
-    @RequestMapping({"/list", "/books"})
+
+    @RequestMapping(value = "/list")
     @ResponseBody
     public List<Book> getList() {
 
@@ -62,8 +89,7 @@ public class BookController {
     }
 
 
-    @RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
-    @ResponseBody
+    @RequestMapping(value="/{id}", method=RequestMethod.DELETE)
     public void deleteBook(@PathVariable Long id) {
 
         bookService.deleteBook(id);
@@ -71,7 +97,6 @@ public class BookController {
         //return "redirect:list";
 
     }
-
 
 
     @PutMapping(value="/edit")
